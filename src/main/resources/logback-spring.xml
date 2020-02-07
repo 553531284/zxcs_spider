@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 不分级别同步文件日志输出配置 -->
+<configuration>
+
+    <!-- 控制台打印日志的相关配置 -->
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- 日志格式 -->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 文件保存日志的相关配置，同步 -->
+    <appender name="fileAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <Prudent>true</Prudent>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>
+                ./logs/%d{yyyy-MM-dd}.log
+            </FileNamePattern>
+        </rollingPolicy>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
+        </layout>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="consoleAppender"/>
+        <appender-ref ref="fileAppender"/>
+    </root>
+
+
+</configuration>

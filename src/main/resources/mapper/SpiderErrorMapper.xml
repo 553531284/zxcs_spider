@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dz.novel.mapper.SpiderErrorMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.dz.novel.entity.SpiderError">
+        <id column="id" property="id"/>
+        <result column="out_id" property="outId"/>
+        <result column="fail_detail" property="failDetail"/>
+        <result column="creat_time" property="creatTime"/>
+        <result column="last_time" property="lastTime"/>
+    </resultMap>
+
+    <insert id="insertOrUpdate" parameterType="com.dz.novel.entity.SpiderError">
+        INSERT INTO spider_error(out_id,fail_detail,creat_time,last_time) VALUES (#{outId},#{failDetail},#{lastTime},#{lastTime})
+        ON DUPLICATE KEY UPDATE out_id=#{outId},fail_detail=#{failDetail},last_time=#{lastTime};
+    </insert>
+
+</mapper>
