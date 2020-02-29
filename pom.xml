@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.dz</groupId>
     <artifactId>novel</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0</version>
     <name>novel</name>
     <description>知轩藏书爬虫</description>
 
