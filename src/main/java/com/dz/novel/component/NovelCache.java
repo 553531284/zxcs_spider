@@ -27,7 +27,7 @@ public class NovelCache {
 
     @PostConstruct
     public void init() {
-        cache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS).build(new CacheLoader<String, Novel>() {
+        cache = CacheBuilder.newBuilder().expireAfterWrite(30, TimeUnit.SECONDS).build(new CacheLoader<String, Novel>() {
             public Novel load(String outId) {
                 return novelMapper.selectOne(Wrappers.<Novel>lambdaQuery().eq(Novel::getOutId, outId));
             }
