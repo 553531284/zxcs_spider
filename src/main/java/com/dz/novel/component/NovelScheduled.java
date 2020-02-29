@@ -97,8 +97,8 @@ public class NovelScheduled {
      */
     @Scheduled(cron = "0 0 4 * * ? ")
     public void refreshLike() {
-        LocalDateTime localDateTime = LocalDateTime.now().plusDays(7);
-        List<Novel> list = novelMapper.selectList(Wrappers.<Novel>lambdaQuery().ge(Novel::getLastTime, localDateTime));
+        LocalDateTime localDateTime = LocalDateTime.now().plusDays(-7);
+        List<Novel> list = novelMapper.selectList(Wrappers.<Novel>lambdaQuery().le(Novel::getLastTime, localDateTime));
         list.forEach(novel -> Spider.create(new ZxPageProcessor())
                 .addUrl(likeUrl.concat(novel.getOutId())).addPipeline(zxPipeline).runAsync());
     }
