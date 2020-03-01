@@ -42,6 +42,11 @@ public class NovelController {
         novelScheduled.zxLikeFailRetry();
     }
 
+    @RequestMapping("/refreshLike")
+    public void refreshLike() {
+        novelScheduled.refreshLike();
+    }
+
     @RequestMapping("/test")
     public void test() {
         novelScheduled.test();

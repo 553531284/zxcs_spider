@@ -73,8 +73,8 @@ public class NovelScheduled {
     @Scheduled(cron = "0 20 1/2 * * ? ")
     public void zxFileFailRetry() {
         List<Novel> list = novelMapper.selectList(Wrappers.<Novel>lambdaQuery().eq(Novel::getFileStatus, "0"));
-        list.forEach(novel -> Spider.create(new ZxPageProcessor())
-                .addUrl(downUrl.concat(novel.getOutId())).addPipeline(zxPipeline).runAsync());
+        Spider.create(new ZxPageProcessor()).addUrl(list.stream().map(novel -> downUrl.concat(novel.getOutId())).toArray(String[]::new))
+                .addPipeline(zxPipeline).thread(10).run();
     }
 
     /**
@@ -85,8 +85,8 @@ public class NovelScheduled {
     @Scheduled(cron = "0 40 1/2 * * ? ")
     public void zxLikeFailRetry() {
         List<Novel> list = novelMapper.selectList(Wrappers.<Novel>lambdaQuery().eq(Novel::getLikeStatus, "0"));
-        list.forEach(novel -> Spider.create(new ZxPageProcessor())
-                .addUrl(likeUrl.concat(novel.getOutId())).addPipeline(zxPipeline).runAsync());
+        Spider.create(new ZxPageProcessor()).addUrl(list.stream().map(novel -> likeUrl.concat(novel.getOutId())).toArray(String[]::new))
+                .addPipeline(zxPipeline).thread(10).run();
     }
 
 
@@ -99,8 +99,8 @@ public class NovelScheduled {
     public void refreshLike() {
         LocalDateTime localDateTime = LocalDateTime.now().plusDays(-7);
         List<Novel> list = novelMapper.selectList(Wrappers.<Novel>lambdaQuery().le(Novel::getLastTime, localDateTime));
-        list.forEach(novel -> Spider.create(new ZxPageProcessor())
-                .addUrl(likeUrl.concat(novel.getOutId())).addPipeline(zxPipeline).runAsync());
+        Spider.create(new ZxPageProcessor()).addUrl(list.stream().map(novel -> likeUrl.concat(novel.getOutId())).toArray(String[]::new))
+                .addPipeline(zxPipeline).thread(10).run();
     }
 
     /**
