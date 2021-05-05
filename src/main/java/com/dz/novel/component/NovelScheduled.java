@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import us.codecraft.webmagic.Spider;
 
-import java.io.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -49,7 +48,7 @@ public class NovelScheduled {
     @Scheduled(cron = "0 0 2 * * ? ")
     public void zxGetOneCol() {
         List<NovelType> list = novelTypeService.list();
-        list.forEach(novelType -> Spider.create(new ZxPageProcessor().setOneCol(true))
+        list.forEach(novelType -> Spider.create(new ZxPageProcessor().setColNum(1))
                 .addUrl(host.concat("/sort/").concat(novelType.getZxId())).addPipeline(zxPipeline).thread(10).run());
     }
 
@@ -103,26 +102,4 @@ public class NovelScheduled {
                 .addPipeline(zxPipeline).thread(10).run();
     }
 
-    /**
-     * @Author: Deng Zhou
-     * @Description:
-     * @Date: 19:30 2020/1/23
-     */
-    //@Scheduled(cron = "0/5 * * * * ? ")
-    public void test() {
-        /*HttpClientDownloader httpClientDownloader = new HttpClientDownloader();
-        //httpClientDownloader.setProxyProvider(SimpleProxyProvider.from(new Proxy("127.0.0.1",5081)));
-        Spider.create(new ZxPageProcessor().setOneCol(true)).addUrl(host.concat("/sort/23"))
-                .addPipeline(zxPipeline).setDownloader(httpClientDownloader).thread(5).run();*/
-
-        File file = new File("C:\\Users\\55353\\Desktop\\test.txt");
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = bufferedReader.readLine()) != null) {
-                Spider.create(new ZxPageProcessor()).addUrl(line).runAsync();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

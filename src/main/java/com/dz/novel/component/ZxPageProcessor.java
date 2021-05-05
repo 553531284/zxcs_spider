@@ -3,6 +3,7 @@ package com.dz.novel.component;
 import com.dz.novel.entity.Novel;
 import com.dz.novel.entity.SpiderError;
 import com.dz.novel.utils.NovelTrie;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,10 +28,10 @@ public class ZxPageProcessor implements PageProcessor {
 
     private static String likeUrl;
 
-    private boolean oneCol = false;
+    private Integer colNum = Integer.MAX_VALUE;
 
-    public ZxPageProcessor setOneCol(boolean oneCol) {
-        this.oneCol = oneCol;
+    public ZxPageProcessor setColNum(Integer colNum) {
+        this.colNum = colNum;
         return this;
     }
 
@@ -46,9 +47,12 @@ public class ZxPageProcessor implements PageProcessor {
         //分类页爬取当前页小说以及下一页
         if (url.contains("sort")) {
             page.addTargetRequests(page.getHtml().$("#plist dt").links().all());
-            if (!oneCol) {
-                page.addTargetRequest(page.getHtml().$("#pagenavi")
-                        .regex("(?<=</span>\\s{1,10}<a\\shref=\")[\\S]*(?=\")").get());
+            String pageUrl = page.getHtml().$("#pagenavi").regex("(?<=</span>\\s{1,10}<a\\shref=\")[\\S]*(?=\")").get();
+            if (pageUrl!=null) {
+                String pageNum = pageUrl.substring(pageUrl.lastIndexOf("/") + 1);
+                if(Integer.parseInt(pageNum)<=colNum){
+                    page.addTargetRequest(pageUrl);
+                }
             }
             page.setSkip(true);
         }
@@ -57,7 +61,7 @@ public class ZxPageProcessor implements PageProcessor {
             Novel novel = new Novel();
             String outId = page.getUrl().get().split("post/")[1];
             if (NovelTrie.getInstance().find(outId)) {
-                LOG.info("outId:".concat(outId).concat("已下载"));
+                LOG.info("outId:".concat(outId).concat("已入库"));
                 page.setSkip(true);
                 return;
             }
@@ -68,16 +72,20 @@ public class ZxPageProcessor implements PageProcessor {
                 novel.setNovelType(SystemInit.zxTypeMap.get(page.getHtml()
                         .$("#content .date a", "href").regex("(?<=sort/)[0-9]*").get()));
                 String size = page.getHtml().$("#content p", "text").regex("(?<=【TXT大小】：).*(?=\\s【内容简介】)").get();
-                String[] s = size.split(" ");
-                if (s.length > 1) {
-                    Double sizeNum = Double.valueOf(s[0]);
-                    if ("KB".equals(s[1])) {
-                        sizeNum /= 1024;
+                if(StringUtils.isNotBlank(size)){
+                    String[] s = size.split(" ");
+                    if (s.length > 1) {
+                        Double sizeNum = Double.valueOf(s[0]);
+                        if ("KB".equals(s[1])) {
+                            sizeNum /= 1024;
+                        }
+                        novel.setNovelSize(sizeNum);
                     }
-                    novel.setNovelSize(sizeNum);
                 }
-                novel.setNovelDetail(page.getHtml().$("#content p", "text")
-                        .regex("(?<=【内容简介】：).*").get().replaceAll((char) 12288 + "", " ").trim());
+                String text = page.getHtml().$("#content p", "text").regex("(?<=【内容简介】：).*").get();
+                if(StringUtils.isNotBlank(text)){
+                    novel.setNovelDetail(text.replaceAll((char) 12288 + "", " ").trim());
+                }
                 page.putField("novel", novel);
                 page.addTargetRequest(likeUrl + outId);
                 page.addTargetRequest(page.getHtml().$(".pagefujian .down_2").links().get());
