@@ -91,12 +91,12 @@ public class NovelScheduled {
 
     /**
      * @Author: Deng Zhou
-     * @Description: 点赞刷新，每天凌晨4点，刷新一周前的点赞
+     * @Description: 点赞刷新，每天凌晨4点，刷新一月前的点赞
      * @Date: 0:45 2020/1/20
      */
     @Scheduled(cron = "0 0 4 * * ? ")
     public void refreshLike() {
-        LocalDateTime localDateTime = LocalDateTime.now().plusDays(-7);
+        LocalDateTime localDateTime = LocalDateTime.now().plusDays(-30);
         List<Novel> list = novelMapper.selectList(Wrappers.<Novel>lambdaQuery().le(Novel::getLastTime, localDateTime));
         Spider.create(new ZxPageProcessor()).addUrl(list.stream().map(novel -> likeUrl.concat(novel.getOutId())).toArray(String[]::new))
                 .addPipeline(zxPipeline).thread(10).run();
